@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eid Bonus Gift</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e0f7fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 450px;
+            border: 2px solid #3498db;
+        }
+
+        h1 {
+            color: #3498db;
+            font-size: 2em;
+        }
+
+        p {
+            color: #555;
+            font-size: 1.1em;
+        }
+
+        .form-step {
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 80%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #3498db;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: #fff;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .credit {
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        .error {
+            color: red;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Claim Your Eid Bonus Gift</h1>
+        <p>Fill in your name and number to receive your bonus!</p>
+        
+        <div id="step1" class="form-step">
+            <label for="name">Your Name:</label>
+            <input type="text" id="name" placeholder="Enter your name" required>
+            <label for="number">Your Number:</label>
+            <input type="text" id="number" placeholder="Enter your number" required>
+            <button onclick="nextStep()">Next</button>
+            <p class="error" id="errorMessage" style="display: none;"></p>
+        </div>
+
+        <div id="step2" class="form-step" style="display:none;">
+            <p>Thank you, <span id="userName"></span>! Your bonus will be sent soon.</p>
+            <p class="credit">Courtesy of Mohammad Shohan (App Developer)</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/twilio@3.41.0/dist/twilio.min.js"></script>
+    <script>
+        const allowedNames = ["sohag", "ismid jahan hira", "ohid"]; // Updated with your names
+
+        function nextStep() {
+            var name = document.getElementById("name").value.toLowerCase(); // Convert name to lowercase for case-insensitive comparison
+            var number = document.getElementById("number").value;
+            
+            // Check if name is allowed
+            if (!allowedNames.includes(name)) {
+                document.getElementById("errorMessage").textContent = "Sorry, this name is not allowed to claim the bonus.";
+                document.getElementById("errorMessage").style.display = "block";
+                return;
+            }
+            
+            // Basic validation for empty fields
+            if (name === "" || number === "") {
+                alert("Please fill out both fields.");
+                return;
+            }
+
+            // Hide the first step and show the second
+            document.getElementById("step1").style.display = "none";
+            document.getElementById("step2").style.display = "block";
+
+            // Display user's name in the second step
+            document.getElementById("userName").textContent = name;
+
+            // Send SMS using Twilio
+            sendSMS(name, number);
+        }
+
+        function sendSMS(name, number) {
+            const accountSid = 'AC86cad5fa3b75bbbd2a24c7f43ee8fd3'; // Your Twilio Account SID
+            const authToken = '945fc8a07893607b8d8334240ae92177'; // Your Twilio Auth Token
+            const twilioPhoneNumber = '+12202405920'; // Your Twilio Phone Number
+
+            const client = Twilio(accountSid, authToken);
+            
+            client.messages.create({
+                body: `Hello ${name}, you have successfully claimed your Eid bonus! Your number is ${number}.`,
+                from: twilioPhoneNumber,
+                to: number
+            })
+            .then(message => console.log("SMS Sent: " + message.sid))
+            .catch(error => console.error("Error sending SMS: " + error));
+        }
+    </script>
+</body>
+</html>
